@@ -296,45 +296,86 @@ void octanteInverso(int *x, int *y){
 }
 
 void bresenham(int x1, int y1, int x2, int y2){
-    int aux1, aux2;
-    int delta_x = x2 - x1;
-    int delta_y = y2 - y1;
-    int d = (2 * delta_y) - delta_x;
-    int incE = 2 * delta_y;
-    int incNE = 2 * (delta_y - delta_x);
-    double m = delta_y / delta_x;
+    bool declive, simetrico;
+    int aux;
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    int dx_ = dx, dy_ = dy, x1_ = x1, x2_ = x2;
     int x , y;
-    bool p_octante = (m >= 0) && (m <= 1);
     
-    /*
-    //Verifica se está no primeiro octante
-    if(!p_octante){
-        primeiroOctante(&x1, &y1, &x2, &y2);
+    //Redução de octante
+    declive = false;
+    simetrico = false;
+    if ((dx * dy) < 0){
+        y1 = (-1) * y1;
+        y2 = (-1) * y2;
+        dy = (-1) * dy;
+        simetrico = true;
+    }
+    if (abs(dx) < abs(dy)){
+        aux = x1;
+        x1 = y1;
+        y1 = aux;
+
+        aux = x2;
+        x2 = y2;
+        y2 = aux;
+
+        aux = dx;
+        dx = dy;
+        dy = aux;
+
+        declive = true;
     }
 
-    //Armazenando os extremos para desenho
-    if(!p_octante)
-        octanteInverso(&x1, &y1);
-    */
+    if(x1 > x2){
+        aux = x1;
+        x1 = x2;
+        x2 = aux;
+
+        aux = y1;
+        y1 = y2; 
+        y2 = aux;
+
+        dx = (-1) * dx;
+        dy = (-1) * dy;
+    }
+    
     x = x1;
     y = y1;
-    pontos = pushPonto(x, y);
+    int x_;
+    int y_;
+
+    //Algoritmo de Bresenham
+    int d = (2 * dy) - dx;
+    int incE = 2 * dy;
+    int incNE = 2 * (dy - dx);
+    
     while(x < x2){
-            //incE
-            if(d <= 0){
-                d += incE;
-            }else{ //incNE
-                d += incNE;
-                y += 1;
-            }
-            x += 1;
-            /*
-            //Transformação para o octante original
-            if(!p_octante)
-                octanteInverso(&x, &y);
-            */
-            pontos = pushPonto(x, y);
+        //incE
+        if(d <= 0){
+            d += incE;
+        }else{ //incNE
+            d += incNE;
+            y += 1;
+        }
+        x += 1;
+        
+        //Transformação para o octante original
+        x_ = x;
+        y_ = y;
+        if(declive == true){
+            x_ = y;
+            y_ = x;
+        }
+
+        if(simetrico == true){
+            y_ = (-1) * y_;
+        }
+        printf("%d %d -> ", x_, y_);
+        pontos = pushPonto(x_, y_);
     }
+    printf("\n");
 }
 
 
