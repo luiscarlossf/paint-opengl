@@ -20,7 +20,7 @@ bool click1 = false, click2 = false;
 
 int x_1,y_1,x_2,y_2;
 
-int shape = 1;
+int shape = 2;
 
 //variáveis usadas para calcular primeiro octante
 bool declive = false, simetrico = false;
@@ -56,20 +56,26 @@ ponto * pushClique(int x, int y){
 	pnt->y = y;
 	pnt->prox = cliques;
 	cliques = pnt;
+    printf("Inserindo pontoClique: (%d, %d)\n", cliques->x, cliques->y);
 	return pnt;
 }
 
 // Funcao para desarmazenar um ponto de clique na lista
 // Desarmazena como uma Pilha (desempilha)
-ponto * popClique(){
-	ponto * pnt;
+
+ponto popClique(){
+    ponto * pnt;
+    ponto saida;
 	pnt = NULL;
 	if(cliques != NULL){
+        saida.x = cliques->x;
+        saida.y = cliques->y;
 		pnt = cliques->prox;
 		delete cliques;
 		cliques = pnt;
+        printf("PontoClique: (%d, %d)\n", saida.x, saida.y);
 	}
-	return pnt;
+	return saida;
 }
 
 // Funcao para armazenar um ponto na lista
@@ -160,7 +166,7 @@ void reshape(int w, int h)
    // quando estivermos a desenhar na tela)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-    click1 = true; //Para redesenhar os pixels selecionados
+    click1 = false; //Para redesenhar os pixels selecionados
     click2 = false;
 }
 
@@ -180,17 +186,23 @@ void mouse(int button, int state, int x, int y)
    switch (button) {
       case GLUT_LEFT_BUTTON:
          if (state == GLUT_DOWN) {
-            if(click1){
-                click2 = true;
-                x_2 = x;
-                y_2 = height - y;
-                printf("x2y2(%d,%d)\n",x_2,y_2);
+            cliques = pushClique(x, height - y);
+            cliques_cont++;
+            if(shape == 2 && cliques_cont == 3)
                 glutPostRedisplay();
-            }else{
-                click1 = true;
-                x_1 = x;
-                y_1 = height - y;
-                printf("x1y1(%d,%d)\n",x_1,y_1);
+            else{
+                if(click1){
+                    click2 = true;
+                    x_2 = x;
+                    y_2 = height - y;
+                    printf("x2y2(%d,%d)\n",x_2,y_2);
+                    //glutPostRedisplay();
+                }else{
+                    click1 = true;
+                    x_1 = x;
+                    y_1 = height - y;
+                    printf("x1y1(%d,%d)\n",x_1,y_1);
+                }
             }
          }
          break;
@@ -236,7 +248,19 @@ void display(void){
         }
     //Triangulo
     }else if (shape == 2){
-        
+        int i=0;
+        ponto c[3]; //os três cliques
+        if(cliques_cont == 3){
+            for(i = 0; i < 3; i++){
+                printf("%d\n", i);
+                c[i] = popClique();
+                cliques_cont--;
+            }
+            triangulo(c[0].x, c[0].y, c[1].x, c[1].y, c[2].x, c[2].y);
+            drawPontos();
+            click1 = false;
+            click2 = false;
+        }
     }
 
     glutSwapBuffers(); // manda o OpenGl renderizar as primitivas
