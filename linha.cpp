@@ -35,9 +35,42 @@ struct ponto{
     ponto * prox;
 };
 
+
 // Lista encadeada de pontos
 // indica o primeiro elemento da lista
 ponto * pontos = NULL;
+
+// Lista encadeada de pontos clicados
+// indica o primeiro elemento da lista
+ponto * cliques = NULL;
+
+//Conta a quantidade de elementos da lista
+int cliques_cont = 0;
+
+// Funcao para armazenar um ponto de clique na lista
+// Armazena como uma Pilha (empilha)
+ponto * pushClique(int x, int y){
+	ponto * pnt;
+	pnt = new ponto;
+	pnt->x = x;
+	pnt->y = y;
+	pnt->prox = cliques;
+	cliques = pnt;
+	return pnt;
+}
+
+// Funcao para desarmazenar um ponto de clique na lista
+// Desarmazena como uma Pilha (desempilha)
+ponto * popClique(){
+	ponto * pnt;
+	pnt = NULL;
+	if(cliques != NULL){
+		pnt = cliques->prox;
+		delete cliques;
+		cliques = pnt;
+	}
+	return pnt;
+}
 
 // Funcao para armazenar um ponto na lista
 // Armazena como uma Pilha (empilha)
@@ -79,6 +112,9 @@ void bresenham(int x1, int y1, int x2, int y2);
 
 //Funcao desenha quadrilátero
 void quadrilatero(int x1, int y1, int x2, int y2);
+
+//Funcao desenha triangulo
+void triangulo(int x1, int y1, int x2, int y2, int x3, int y3);
 
 // Funcao que percorre a lista de pontos desenhando-os na tela
 void drawPontos();
@@ -132,6 +168,7 @@ void reshape(int w, int h)
 void keyboard(unsigned char key, int x, int y){
     switch (key) { // key - variavel que possui valor ASCII da tecla precionada
         case 27: // codigo ASCII da tecla ESC
+            while(popPonto() != NULL);
             exit(0); // comando pra finalizacao do programa
         break;
     }
@@ -197,6 +234,9 @@ void display(void){
             click1 = false;
             click2 = false; 
         }
+    //Triangulo
+    }else if (shape == 2){
+        
     }
 
     glutSwapBuffers(); // manda o OpenGl renderizar as primitivas
@@ -344,6 +384,13 @@ void quadrilatero(int x1, int y1, int x2, int y2){
     bresenham(x2, y2, x1, y2);
     bresenham(x1, y2, x1, y1);
     printf("\n\n");
+}
+
+void triangulo(int x1, int y1, int x2, int y2, int x3, int y3){
+    printf("Desenhando quadrilátero. Extremos: (%d, %d), (%d, %d) e (%d, %d)\n", x1, y1, x2, y2, x3, y3);
+    bresenham(x1, y1, x2, y2);
+    bresenham(x2, y2, x3, y3);
+    bresenham(x3, y3, x1, y1);
 }
 
 
