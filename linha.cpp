@@ -20,6 +20,8 @@ bool click1 = false, click2 = false;
 
 int x_1,y_1,x_2,y_2;
 
+int shape = 1;
+
 //variáveis usadas para calcular primeiro octante
 bool declive = false, simetrico = false;
 
@@ -71,9 +73,13 @@ void mouse(int button, int state, int x, int y);
 
 // Funcao que implementa o Algoritmo Imediato para rasterizacao de retas
 void retaImediata(double x1,double y1,double x2,double y2);
-void primeiroOctante(int * x1, int * y1, int * x2, int * y2);
-void octanteInverso(int * x, int * y);
+
+//Funcao desenha reta
 void bresenham(int x1, int y1, int x2, int y2);
+
+//Funcao desenha quadrilátero
+void quadrilatero(int x1, int y1, int x2, int y2);
+
 // Funcao que percorre a lista de pontos desenhando-os na tela
 void drawPontos();
 
@@ -175,11 +181,22 @@ void display(void){
     glColor3f (0.0, 0.0, 0.0); // Seleciona a cor default como preto
     
 
-    if(click1 && click2){
-        bresenham(x_1, y_1, x_2, y_2);
-        drawPontos();
-        click1 = false;
-        click2 = false;
+    //Reta
+    if(shape == 0){
+        if(click1 && click2){
+            bresenham(x_1, y_1, x_2, y_2);
+            drawPontos();
+            click1 = false;
+            click2 = false;
+        }
+    //Quadrilátero
+    }else if (shape == 1){
+        if(click1 && click2){
+            quadrilatero(x_1, y_1, x_2, y_2);
+            drawPontos();
+            click1 = false;
+            click2 = false; 
+        }
     }
 
     glutSwapBuffers(); // manda o OpenGl renderizar as primitivas
@@ -238,64 +255,8 @@ void retaImediata(double x1,double y1,double x2,double y2){
     }
 }
 
-void primeiroOctante(int * x1, int * y1, int * x2, int * y2){
-    printf("Primeiro octante: (%d,  %d) - (%d, %d) -> ", (*x1), (*y1), (*x2), (*y2));
-    declive = false;
-    simetrico = false;
-    int delta_x = (*x2) - (*x1);
-    int delta_y = (*y2) - (*y1);
-    //Primeiro teste - Simetria
-    if ((delta_x * delta_y) < 0){
-        simetrico = true;
-        (*y1) = -(*y1);
-        (*y2) = -(*y2);
-        delta_y = -delta_y;
-    }
-
-    //Segundo teste - Declive
-    if(abs(delta_x) < abs(delta_y)){
-        int aux;
-        declive = true;
-        aux = (*x1);
-        (*x1) = (*y1);
-        (*y1) = aux;
-        aux = (*x2);
-        (*x2) = (*y2);
-        (*y2) = aux;
-        aux = delta_x;
-        delta_x = delta_y;
-        delta_y = aux;
-    }
-    //Terceiro teste
-    if((*x1) > (*x2)){
-        int aux1, aux2;
-        aux1 = (*x1);
-        aux2 = (*y1);
-        (*x1) = (*x2);
-        (*y1) = (*y2);
-        (*x2) = aux1;
-        (*y2) = aux2;
-        delta_x = -delta_x;
-        delta_y = -delta_y;
-    }
-    printf("> (%d,  %d) - (%d, %d)\n", (*x1), (*y1), (*x2), (*y2));
-}
-
-void octanteInverso(int *x, int *y){
-    printf("Invertendo: (%d , %d) -> ", (*x),(*y));
-    if(declive){
-        int aux = (*x);
-        (*x) = (*y);
-        (*y) = aux;
-    }
-
-    if(simetrico){
-        (*y) = -(*y);
-    }
-    printf("-> (%d , %d)\n", (*x),(*y));
-}
-
 void bresenham(int x1, int y1, int x2, int y2){
+    printf("Desenhando resta. Extremos: (%d, %d) e (%d, %d)\n", x1, y1, x2, y2);
     bool declive, simetrico;
     int aux;
     int dx = x2 - x1;
@@ -372,10 +333,17 @@ void bresenham(int x1, int y1, int x2, int y2){
         if(simetrico == true){
             y_ = (-1) * y_;
         }
-        printf("%d %d -> ", x_, y_);
         pontos = pushPonto(x_, y_);
     }
-    printf("\n");
+}
+
+void quadrilatero(int x1, int y1, int x2, int y2){
+    printf("Desenhando quadrilátero. Topo esquerdo: (%d, %d) Base Direita: (%d, %d)\n", x1, y1, x2, y2);
+    bresenham(x1, y1, x2, y1);
+    bresenham(x2, y1, x2, y2);
+    bresenham(x2, y2, x1, y2);
+    bresenham(x1, y2, x1, y1);
+    printf("\n\n");
 }
 
 
