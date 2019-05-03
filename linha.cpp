@@ -16,11 +16,10 @@
 #include <cstdlib>
 
 // Variaveis Globais
-bool click1 = false, click2 = false;
 
-int x_1,y_1,x_2,y_2;
+int x_0, y_0, x_1,y_1,x_2,y_2;
 
-int shape = 2;
+int shape = 3;
 
 //variáveis usadas para calcular primeiro octante
 bool declive = false, simetrico = false;
@@ -34,7 +33,6 @@ struct ponto{
     int y;
     ponto * prox;
 };
-
 
 // Lista encadeada de pontos
 // indica o primeiro elemento da lista
@@ -166,8 +164,6 @@ void reshape(int w, int h)
    // quando estivermos a desenhar na tela)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-    click1 = false; //Para redesenhar os pixels selecionados
-    click2 = false;
 }
 
 // Funcao usada na funcao callback para utilizacao das teclas normais do teclado
@@ -188,21 +184,54 @@ void mouse(int button, int state, int x, int y)
          if (state == GLUT_DOWN) {
             cliques = pushClique(x, height - y);
             cliques_cont++;
-            if(shape == 2 && cliques_cont == 3)
-                glutPostRedisplay();
-            else{
-                if(click1){
-                    click2 = true;
-                    x_2 = x;
-                    y_2 = height - y;
-                    printf("x2y2(%d,%d)\n",x_2,y_2);
-                    //glutPostRedisplay();
-                }else{
-                    click1 = true;
+            switch (shape)
+            {
+            //Reta
+            case 0:
+                if(cliques_cont == 2){
+                    glutPostRedisplay();
+                }
+                break;
+            //Quadrilátero
+            case 1:
+                if(cliques_cont == 2){
+                    glutPostRedisplay();
+                }
+                break;
+            //Triangulo
+            case 2:
+                if(cliques_cont == 3){
+                    glutPostRedisplay();
+                }
+                break;
+            //Poligono
+            case 3:
+                if(cliques_cont == 1){
                     x_1 = x;
                     y_1 = height - y;
+                    x_2 = x;
+                    y_2 = height- y;
+                    printf("x2y2(%d,%d)\n",x_2,y_2);
+                    //glutPostRedisplay();
+                }else if (cliques_cont > 1){
+                    x_1 = x_2;
+                    y_1 = y_2;
+                    x_2 = x;
+                    y_2 = height - y;
                     printf("x1y1(%d,%d)\n",x_1,y_1);
                 }
+
+                glutPostRedisplay();
+                break;
+            //Circunferência
+            case 4:
+                if(cliques_cont == 2){
+                    glutPostRedisplay();
+                }
+                break;
+            
+            default:
+                break;
             }
          }
          break;
@@ -223,45 +252,82 @@ void mouse(int button, int state, int x, int y)
    }
 }
 
+void mouse_m(int x, int y){
+}
 
 // Funcao usada na funcao callback para desenhar na tela
 void display(void){
     glClear(GL_COLOR_BUFFER_BIT); //Limpa o Buffer de Cores
     glColor3f (0.0, 0.0, 0.0); // Seleciona a cor default como preto
-    
-
-    //Reta
-    if(shape == 0){
-        if(click1 && click2){
-            bresenham(x_1, y_1, x_2, y_2);
-            drawPontos();
-            click1 = false;
-            click2 = false;
-        }
-    //Quadrilátero
-    }else if (shape == 1){
-        if(click1 && click2){
-            quadrilatero(x_1, y_1, x_2, y_2);
-            drawPontos();
-            click1 = false;
-            click2 = false; 
-        }
-    //Triangulo
-    }else if (shape == 2){
-        int i=0;
-        ponto c[3]; //os três cliques
-        if(cliques_cont == 3){
-            for(i = 0; i < 3; i++){
-                printf("%d\n", i);
-                c[i] = popClique();
-                cliques_cont--;
+    int i;
+    switch (shape)
+            {
+            //Reta
+            case 0:
+                ponto cr[2]; //os três cliques
+                if(cliques_cont == 2){
+                    for(i = 0; i < 2; i++){
+                        cr[i] = popClique();
+                        cliques_cont--;
+                    }
+                    bresenham(cr[0].x, cr[0].y, cr[1].x, cr[1].y);
+                    drawPontos();
+                }
+                break;
+            //Quadrilátero
+            case 1:
+                ponto cq[2]; //os três cliques
+                if(cliques_cont == 2){
+                    for(i = 0; i < 2; i++){
+                        cq[i] = popClique();
+                        cliques_cont--;
+                    }
+                    quadrilatero(cq[0].x, cq[0].y, cq[1].x, cq[1].y);
+                    drawPontos();
+                }
+                break;
+            //Triangulo
+            case 2:
+                ponto ct[3]; //os três cliques
+                if(cliques_cont == 3){
+                    for(i = 0; i < 3; i++){
+                        ct[i] = popClique();
+                        cliques_cont--;
+                    }
+                    triangulo(ct[0].x, ct[0].y, ct[1].x, ct[1].y, ct[2].x, ct[2].y);
+                    drawPontos();
+                }
+                break;
+            //Poligono
+            case 3:
+                ponto aux;
+                if(cliques_cont == 1){
+                    x_0 = x_1;
+                    y_0 = y_1;
+                }
+                if(cliques_cont > 1){
+                    if(((x_2 >= x_0 - 4) && (y_2 <= y_0 + 4)) && ((x_2 <= x_0 + 4) && (y_2 >= y_0 - 4))){
+                        x_2 = x_0;
+                        y_2 = y_0;
+                    } 
+                    bresenham(x_1, y_1, x_2, y_2);
+                    drawPontos();
+                    if(x_0 == x_2 && y_0 == y_2){
+                        while(cliques_cont != 0){
+                            aux = popClique();
+                            cliques_cont--;
+                        }
+                        cliques_cont = 0;
+                    }
+                }
+                break;
+            //Circunferência
+            case 4:
+                break;
+            
+            default:
+                break;
             }
-            triangulo(c[0].x, c[0].y, c[1].x, c[1].y, c[2].x, c[2].y);
-            drawPontos();
-            click1 = false;
-            click2 = false;
-        }
-    }
 
     glutSwapBuffers(); // manda o OpenGl renderizar as primitivas
 
@@ -277,46 +343,6 @@ void drawPontos(){
             pnt = pnt->prox;
         }
     glEnd();  // indica o fim do desenho
-}
-
-void retaImediata(double x1,double y1,double x2,double y2){
-    double m, b, yd, xd;
-    double xmin, xmax,ymin,ymax;
-    //Armazenando os extremos para desenho
-    pontos = pushPonto((int)x1,(int)y1);
-    pontos = pushPonto((int)x2,(int)y2);
-
-    if(x2-x1 != 0){ //Evita a divis�o por zero
-        m = (y2-y1)/(x2-x1);
-        b = y1 - (m*x1);
-
-        if(m>=-1 && m <= 1){ // Verifica se o declive da reta tem tg de -1 a 1, se verdadeira calcula incrementando x
-            xmin = (x1 < x2)? x1 : x2;
-            xmax = (x1 > x2)? x1 : x2;
-
-            for(int x = (int)xmin+1; x < xmax; x++){
-                yd = (m*x)+b;
-                yd = floor(0.5+yd);
-                pontos = pushPonto(x,(int)yd);
-            }
-        }else{ // Se menor que -1 ou maior que 1, calcula incrementado os valores de y
-            ymin = (y1 < y2)? y1 : y2;
-            ymax = (y1 > y2)? y1 : y2;
-
-            for(int y = (int)ymin + 1; y < ymax; y++){
-                xd = (y - b)/m;
-                xd = floor(0.5+xd);
-                pontos = pushPonto((int)xd,y);
-            }
-        }
-
-    }else{ // se x2-x1 == 0, reta perpendicular ao eixo x
-        ymin = (y1 < y2)? y1 : y2;
-        ymax = (y1 > y2)? y1 : y2;
-        for(int y = (int)ymin + 1; y < ymax; y++){
-            pontos = pushPonto((int)x1,y);
-        }
-    }
 }
 
 void bresenham(int x1, int y1, int x2, int y2){
