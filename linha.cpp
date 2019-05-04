@@ -19,7 +19,7 @@
 
 int x_0, y_0, x_1,y_1,x_2,y_2;
 
-int shape = 3;
+int shape = 4;
 
 //variáveis usadas para calcular primeiro octante
 bool declive = false, simetrico = false;
@@ -119,6 +119,9 @@ void quadrilatero(int x1, int y1, int x2, int y2);
 
 //Funcao desenha triangulo
 void triangulo(int x1, int y1, int x2, int y2, int x3, int y3);
+
+//Funcao desenha circunferencia
+void circunferencia( int cx, int cy, int raio);
 
 // Funcao que percorre a lista de pontos desenhando-os na tela
 void drawPontos();
@@ -225,7 +228,12 @@ void mouse(int button, int state, int x, int y)
                 break;
             //Circunferência
             case 4:
-                if(cliques_cont == 2){
+                if(cliques_cont == 1){
+                    x_1 = x;
+                    y_1 = height - y;
+                }else if(cliques_cont == 2){
+                    x_2 = x;
+                    y_2 = height - y;
                     glutPostRedisplay();
                 }
                 break;
@@ -260,6 +268,7 @@ void display(void){
     glClear(GL_COLOR_BUFFER_BIT); //Limpa o Buffer de Cores
     glColor3f (0.0, 0.0, 0.0); // Seleciona a cor default como preto
     int i;
+    ponto aux;
     switch (shape)
             {
             //Reta
@@ -300,7 +309,6 @@ void display(void){
                 break;
             //Poligono
             case 3:
-                ponto aux;
                 if(cliques_cont == 1){
                     x_0 = x_1;
                     y_0 = y_1;
@@ -323,6 +331,17 @@ void display(void){
                 break;
             //Circunferência
             case 4:
+                int raio;
+                if(cliques_cont == 2){
+                    printf("X1(%d,%d) X2(%d, %d)\n", x_1, y_1, x_2, y_2);
+                    raio = sqrt(pow((x_2 - x_1), 2) + pow((y_2 - y_1), 2));
+                    circunferencia(x_1, y_1, raio);
+                    drawPontos();
+                    while(cliques_cont != 0){
+                            aux = popClique();
+                            cliques_cont--;
+                    }
+                }
                 break;
             
             default:
@@ -443,6 +462,39 @@ void triangulo(int x1, int y1, int x2, int y2, int x3, int y3){
     bresenham(x3, y3, x1, y1);
 }
 
+void circunferencia(int cx, int cy, int raio){
+    printf("Desenhando Circunferência. Raio: %d, Centroide: (%d, %d)\n", raio, cx, cy);
+    int d = 1 - raio;
+    int de = 3;
+    int dse = (-2 * raio) + 5;
+    int x = 0, y = raio;
+    pontos = pushPonto(0 + cx, raio + cy);
+    pontos = pushPonto(0 + cx, -raio  + cy);
+    pontos = pushPonto(raio + cx, 0  + cy);
+    pontos = pushPonto(-raio + cx, 0 + cy);
+    while(y > x){
+        if( d < 0){
+            d += de;
+            de += 2;
+            dse += 2;
+        }else{
+            d += dse;
+            de += 2;
+            dse += 4;
+            y--;
+        }
+        x++;
+        pontos = pushPonto(x + cx, y + cy);
+        pontos = pushPonto(-x + cx, y + cy);
+        pontos = pushPonto(x + cx, -y + cy);
+        pontos = pushPonto(-x + cx, -y + cy);
+        pontos = pushPonto(y + cx, x + cy);
+        pontos = pushPonto(-y + cx, x + cy);
+        pontos = pushPonto(y + cx, -x + cy);
+        pontos = pushPonto(-y + cx, -x + cy);
+    }
+
+}
 
 
 
