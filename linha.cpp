@@ -495,6 +495,50 @@ void circunferencia(int cx, int cy, int raio){
     }
 
 }
+//Pontos, unidades em x e y
+void translacao(ponto * pontos, int tx, int ty){
+    ponto * aux = pontos;//Interpreta os pontos
+    while(aux != NULL){
+        aux->x = aux->x + tx;
+        aux->y = aux->y + ty;
+        aux = pontos->prox;
+    }
+}
+
+void escala(ponto * pontos , double sx, double sy){
+    ponto * aux = pontos;//Interpreta os pontos
+    while(aux != NULL){
+        aux->x = aux->x * sx;
+        aux->y = aux->y * sy;
+        aux = pontos->prox;
+    }
+}
+void cisalhamento(ponto * pontos, int cx = 0, int cy = 0){
+    ponto * aux = pontos;//Interpreta os pontos
+    while(aux != NULL){
+        aux->x = aux->x + (cx * aux->y);
+        aux->y = (aux->x * cy) + aux->y;
+        aux = pontos->prox;
+    }
+}
+void reflexao(ponto * pontos, bool x, bool y){
+    ponto * aux = pontos;//Interpreta os pontos
+    while(aux != NULL){
+        if(x == true)
+            aux->x = 0 - aux->x;
+        if(y == true)
+            aux->y = 0 - aux->y;
+        aux = pontos->prox;
+    }
+}
+void rotacao(ponto * pontos, double angulo){
+    ponto * aux = pontos;//Interpreta os pontos
+    while(aux != NULL){
+        aux->x = (aux->x * cos(angulo)) - (aux->y * sin(angulo));
+        aux->y = (aux->x * sin(angulo)) + (aux->y * cos(angulo));
+        aux = pontos->prox;
+    }
+}
 
 
 
