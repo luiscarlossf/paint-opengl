@@ -20,6 +20,7 @@
 int x_0, y_0, x_1,y_1,x_2,y_2;
 
 int shape = 4;
+bool preenchido = false;
 
 //variáveis usadas para calcular primeiro octante
 bool declive = false, simetrico = false;
@@ -123,6 +124,9 @@ void triangulo(int x1, int y1, int x2, int y2, int x3, int y3);
 //Funcao desenha circunferencia
 void circunferencia( int cx, int cy, int raio);
 
+//Funcao cria menu
+void criaMenu();
+
 // Funcao que percorre a lista de pontos desenhando-os na tela
 void drawPontos();
 
@@ -140,6 +144,7 @@ int main(int argc, char** argv){
     glutKeyboardFunc(keyboard); //funcao callback do teclado
     glutMouseFunc(mouse); //funcao callback do mouse
     glutDisplayFunc(display); //funcao callback de desenho
+    criaMenu();
     glutMainLoop(); // executa o loop do OpenGL
     return 0; // retorna 0 para o tipo inteiro da funcao main();
 }
@@ -244,16 +249,19 @@ void mouse(int button, int state, int x, int y)
          }
          break;
 /*
+      case GLUT_RIGHT_BUTTON:
+         if (state == GLUT_DOWN) {
+            criaMenu();
+         }
+         break;
+*/
+/*
       case GLUT_MIDDLE_BUTTON:
          if (state == GLUT_DOWN) {
             glutPostRedisplay();
          }
          break;
-      case GLUT_RIGHT_BUTTON:
-         if (state == GLUT_DOWN) {
-            glutPostRedisplay();
-         }
-         break;
+      
 */
       default:
          break;
@@ -538,6 +546,147 @@ void rotacao(ponto * pontos, double angulo){
         aux->y = (aux->x * sin(angulo)) + (aux->y * cos(angulo));
         aux = pontos->prox;
     }
+}
+
+void menuQuad(int op){
+    switch (op)
+    {
+    case 0:
+        shape = 1;
+        preenchido = false;
+        break;
+    case 1:
+        shape = 1;
+        preenchido = true;
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void menuTri(int op){
+    switch (op)
+    {
+    case 0:
+        shape = 2;
+        preenchido = false;
+        break;
+    case 1:
+        shape = 2;
+        preenchido = true;
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void menuPoli(int op){
+    switch (op)
+    {
+    case 0:
+        shape = 3;
+        preenchido = false;
+        break;
+    case 1:
+        shape = 3;
+        preenchido = true;
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void menuCir(int op){
+    switch (op)
+    {
+    case 0:
+        shape = 4;
+        preenchido = false;
+        break;
+    case 1:
+        shape = 4;
+        preenchido = true;
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void menuTrans(int op){
+    switch (op)
+    {
+    case 0:
+        //translacao
+        break;
+    case 1:
+        /* escala */
+        break;
+    case 2:
+        /* cisalhamento */
+        break;
+    case 3:
+        /* reflexao */
+        break;
+    case 4:
+        /* rotacao */
+        break;    
+    default:
+        break;
+    }
+}
+
+void menuPrincipal(int op){
+    switch (op)
+    {
+    case 0:
+        shape = 0;
+        break;
+    
+    default:
+        break;
+    }
+}
+
+
+void criaMenu(){
+    int menu, submenu1, submenu2, submenu3, submenu4, submenu5;
+    printf("Criando Menu\n");
+    submenu1 = glutCreateMenu(menuQuad);
+    glutAddMenuEntry("Não preenchida", 0);
+    glutAddMenuEntry("Preenchida", 1);
+
+    submenu2 = glutCreateMenu(menuTri);
+    glutAddMenuEntry("Não preenchida", 0);
+    glutAddMenuEntry("Preenchida", 1);
+
+    submenu3 = glutCreateMenu(menuPoli);
+    glutAddMenuEntry("Não preenchida", 0);
+    glutAddMenuEntry("Preenchida", 1);
+
+    submenu4 = glutCreateMenu(menuCir);
+    glutAddMenuEntry("Não preenchida", 0);
+    glutAddMenuEntry("Preenchida", 1);
+
+    submenu5 = glutCreateMenu(menuTrans);
+    glutAddMenuEntry("Translação", 0);
+    glutAddMenuEntry("Escala", 1);
+    glutAddMenuEntry("Cisalhamento", 2);
+    glutAddMenuEntry("Reflexão", 3);
+    glutAddMenuEntry("Rotação", 4);
+
+    menu = glutCreateMenu(menuPrincipal);
+    glutAddMenuEntry("Reta", 0);
+    glutAddSubMenu("Quadrilátero", submenu1);
+    glutAddSubMenu("Triângulo", submenu2);
+    glutAddSubMenu("Polígono", submenu3);
+    glutAddSubMenu("Circunferência", submenu4);
+    glutAddSubMenu("Transformação", submenu5);
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 
