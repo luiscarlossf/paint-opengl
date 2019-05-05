@@ -1,8 +1,9 @@
 //*********************************************************************
-//  Codigo exemplo para aula pratica de Computacao Grafica 
+//  Código implementa um programa simples similar ao
+//  ao Paint da Microsoft. 
 //  Assunto: Rasterizacao e Transformacoes Geometricas
 //
-//  Autor: Prof. Laurindo de Sousa Britto Neto
+//  Autor: Luis Carlos da Silva Filho
 //*********************************************************************
 
 // Bibliotecas utilizadas pelo OpenGL
